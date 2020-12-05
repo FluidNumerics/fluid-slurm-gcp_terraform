@@ -123,7 +123,7 @@ variable "slurm_db" {
   type = object({
     cloudsql_name = string
     cloudsql_ip = string
-    cloudsql_port = string
+    cloudsql_port = number
   })
   default = { cloudsql_name = null, 
               cloudsql_ip = null, 

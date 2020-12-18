@@ -74,21 +74,22 @@ data "google_iam_policy" "slurm_gcp_iam" {
 
 locals {
   cluster_config = { compute_image = var.compute_image,
-                     compute_service_accounts = google_service_account.slurm_compute.email,
-                     controller_image = var.controller_image,
-                     default_partition = var.default_partition,
-                     login_image = var.login_image,
-                     partitions = var.partitions,
-                     slurm_accounts = var.slurm_accounts,
-                     name = var.name,
-                     tags = var.tags,
-                     controller = var.controller,
-                     login = var.login,
-                     mounts = var.mounts,
-                     slurm_db = var.slurm_db,
-                     munge_key = var.munge_key,
-                     suspend_time = var.suspend_time
-                   }
+                            compute_service_accounts = google_service_account.slurm_compute.email,
+                            controller_image = var.controller_image,
+                            default_partition = var.default_partition,
+                            login_image = var.login_image,
+                            partitions = var.partitions,
+                            slurm_accounts = var.slurm_accounts,
+                            name = var.name,
+                            tags = var.tags,
+                            controller = var.controller,
+                            login = var.login,
+                            mounts = var.mounts,
+                            slurm_db = var.slurm_db,
+                            munge_key = var.munge_key,
+                            suspend_time = var.suspend_time
+                            }
+               
 }
 
 // ***************************************** //
@@ -131,7 +132,7 @@ resource "google_compute_instance" "controller_node" {
   }
   service_account {
     email  = google_service_account.slurm_controller.email
-    scopes = ["sql-admin","storage-ro","logging-write","monitoring-write","compute-rw"]
+    scopes = ["cloud-platform"]
   }
   lifecycle{
     ignore_changes = [metadata_startup_script]
@@ -181,7 +182,7 @@ resource "google_compute_instance" "login_node" {
   }
   service_account {
     email  = google_service_account.slurm_login.email
-    scopes = ["storage-full","logging-write","monitoring-write"]
+    scopes = ["cloud-platform"]
   }
   lifecycle{
     ignore_changes = [metadata_startup_script]

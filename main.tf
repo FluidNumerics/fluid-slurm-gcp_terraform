@@ -58,7 +58,7 @@ data "google_iam_policy" "slurm_gcp_iam" {
 
   binding {
     role = "roles/iam.serviceAccountUser"
-    members = flatten([var.slurm_gcp_users,var.slurm_gcp_admins])
+    members = flatten([var.slurm_gcp_users,var.slurm_gcp_admins,"serviceAccount:${google_service_account.slurm_controller.email}"])
   }
 
   binding {

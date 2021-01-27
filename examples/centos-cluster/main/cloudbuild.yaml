@@ -1,0 +1,38 @@
+
+steps:
+- id: Terraform
+  name: 'hashicorp/terraform:0.12.26'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      terraform init
+      terraform validate || exit 1
+      terraform plan || exit 1
+      terraform apply --auto-approve || exit 1
+
+
+- id: Cluster-services update
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: '/bin/sh'
+  args: 
+  - '-c'
+  - | 
+      ssh-keygen -b 2048 -t rsa -f /tmp/sshkey -q -N ""
+
+      gcloud compute ssh ${_CONTROLLER} \
+         --zone=${_ZONE} \
+         --ssh-key-file=/tmp/sshkey \
+         --command="sudo -i cluster-services update config"
+
+      sleep 30
+
+      gcloud compute ssh ${_CONTROLLER} \
+         --zone=${_ZONE} \
+         --ssh-key-file=/tmp/sshkey \
+         --command="sudo -i cluster-services update all"
+
+substitutions:
+  _CONTROLLER: 'slurm-controller'
+  _ZONE: 'us-west1-b'
+

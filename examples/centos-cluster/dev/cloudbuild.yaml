@@ -1,0 +1,11 @@
+
+steps:
+- id: Terraform plan
+  name: 'hashicorp/terraform:0.12.26'
+  entrypoint: 'sh'
+  args: 
+  - '-c'
+  - | 
+      terraform init
+      terraform validate || exit 1
+      terraform plan || exit 1

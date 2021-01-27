@@ -215,8 +215,7 @@ locals {
 
 // Create the Slurm-GCP cluster
 module "slurm_gcp" {
-  //source  = "github.com/fluidnumerics/fluid-slurm-gcp_terraform"
-  source  = "../../"
+  source  = "github.com/fluidnumerics/fluid-slurm-gcp_terraform"
   controller_image = var.controller_image
   compute_image = var.compute_image
   login_image = var.login_image

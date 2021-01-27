@@ -1,6 +1,6 @@
 // Configure the Google Cloud provider
 provider "google" {
- version = "3.9"
+ version = "3.54"
 }
 
 // ***************************************** //
@@ -30,8 +30,63 @@ resource "google_service_account" "slurm_login" {
 // ***************************************** //
 // Set IAM policies
 
-// Set the IAM policies on the parent folder that houses the slurm-gcp deployment
+locals {
+  iam_folder_count = (var.parent_folder == "") ? 0 : 1
+  compute_admins = flatten(["serviceAccount:${google_service_account.slurm_controller.email}",var.slurm_gcp_admins])
+  cloudsql_admins = flatten(["serviceAccount:${google_service_account.slurm_controller.email}",var.slurm_gcp_admins])
+  storage_admins = flatten(["serviceAccount:${google_service_account.slurm_compute.email}","serviceAccount:${google_service_account.slurm_login.email}",var.slurm_gcp_admins])
+  oslogin = var.slurm_gcp_users
+  oslogin_admins = var.slurm_gcp_admins
+  service_account_users = flatten([var.slurm_gcp_users,var.slurm_gcp_admins,"serviceAccount:${google_service_account.slurm_controller.email}"])
+}
+
+
+// Opt for non-authorizative modifications to project IAM policies
+resource "google_project_iam_member" "project_compute_admins" {
+  count = length(local.compute_admins)
+  project = var.controller.project
+  role = "roles/compute.admin"
+  member = local.compute_admins[count.index]
+}
+
+resource "google_project_iam_member" "project_cloudsql_admins" {
+  count = length(local.cloudsql_admins)
+  project = var.controller.project
+  role = "roles/cloudsql.admin"
+  member = local.cloudsql_admins[count.index]
+}
+
+resource "google_project_iam_member" "project_storage_admins" {
+  count = length(local.storage_admins)
+  project = var.controller.project
+  role = "roles/storage.admin"
+  member = local.storage_admins[count.index]
+}
+
+resource "google_project_iam_member" "project_oslogin" {
+  count = length(local.oslogin)
+  project = var.controller.project
+  role = "roles/compute.osLogin"
+  member = local.oslogin[count.index]
+}
+
+resource "google_project_iam_member" "project_oslogin_admin" {
+  count = length(local.oslogin_admins)
+  project = var.controller.project
+  role    = "roles/compute.osAdminLogin"
+  member = local.oslogin_admins[count.index]
+}
+
+resource "google_project_iam_member" "project_service_account_users" {
+  count = length(local.service_account_users)
+  project = var.controller.project
+  role = "roles/iam.serviceAccountUser"
+  member = local.service_account_users[count.index]
+}
+
+// If a folder is provided, set the IAM policies on the parent folder that houses the slurm-gcp deployment
 resource "google_folder_iam_policy" "slurm_gcp_folder_policy" {
+  count = local.iam_folder_count
   folder = var.parent_folder
   policy_data = data.google_iam_policy.slurm_gcp_iam.policy_data
 }
@@ -48,7 +103,7 @@ data "google_iam_policy" "slurm_gcp_iam" {
   }
   binding {
     role = "roles/storage.admin"
-    members = flatten(["serviceAccount:${google_service_account.slurm_compute.email}","serviceAccount:${google_service_account.slurm_login.email}",var.slurm_gcp_users, var.slurm_gcp_admins])
+    members = flatten(["serviceAccount:${google_service_account.slurm_compute.email}","serviceAccount:${google_service_account.slurm_login.email}",var.slurm_gcp_admins])
   }
 
   binding {

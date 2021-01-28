@@ -125,9 +125,9 @@ variable "slurm_db" {
     cloudsql_ip = string
     cloudsql_port = number
   })
-  default = { cloudsql_name = null, 
-              cloudsql_ip = null, 
-              cloudsql_port = null}
+  default = { cloudsql_name = "", 
+              cloudsql_ip = "", 
+              cloudsql_port = ""}
 }
   
 variable "slurm_accounts" {

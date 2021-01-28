@@ -41,22 +41,9 @@ locals {
   cluster_name = "${var.cluster_name}"
 }
 
-// Mark the Controller project as the Shared VPC Host Project
-resource "google_compute_shared_vpc_host_project" "host" {
-  project = var.primary_project
-}
-
 // Obtain a unique list of projects from the partitions, excluding the host project
 locals {
   projects = distinct([for p in var.partitions : p.project if p.project != var.primary_project])
-}
-
-// Mark the Shared VPC Service Projects
-resource "google_compute_shared_vpc_service_project" "service" {
-  count = length(local.projects)
-  host_project = var.primary_project
-  service_project = local.projects[count.index]
-  depends_on = [google_compute_shared_vpc_host_project.host]
 }
 
 // Create the Shared VPC Network
@@ -64,7 +51,6 @@ resource "google_compute_network" "shared_vpc_network" {
   name = "${local.cluster_name}-shared-network"
   project = var.primary_project
   auto_create_subnetworks = false
-  depends_on = [google_compute_shared_vpc_host_project.host]
 }
 
 resource "google_compute_subnetwork" "default_subnet" {

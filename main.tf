@@ -140,7 +140,6 @@ locals {
                      controller = var.controller,
                      login = var.login,
                      mounts = var.mounts,
-                     slurm_db = var.slurm_db,
                      munge_key = var.munge_key,
                      suspend_time = var.suspend_time
                    }

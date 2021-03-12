@@ -10,13 +10,12 @@ terraform {
 
 // Configure the Google Cloud provider
 provider "google" {
- version = "3.54"
 }
 
 provider "google-beta" {
-  version = "3.54"
 }
 
+/*
 // Enable necessary APIs
 resource "google_project_service" "compute" {
   project = var.primary_project
@@ -35,6 +34,7 @@ resource "google_project_service" "service_networking" {
   service = "servicenetworking.googleapis.com"
   disable_dependent_services = true
 }
+*/
 
 locals {
   primary_region = trimsuffix(var.primary_zone,substr(var.primary_zone,-2,-2))

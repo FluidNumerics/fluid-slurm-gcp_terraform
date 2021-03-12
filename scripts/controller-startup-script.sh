@@ -8,3 +8,5 @@ systemctl start nfs-server
 
 /apps/cls/bin/cluster-services setup
 /apps/cls/bin/cluster-services system-checks
+/apps/cls/bin/cluster-services update slurm_accounts
+

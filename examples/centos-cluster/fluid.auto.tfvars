@@ -11,7 +11,7 @@ partitions = [{name = "demo"
                max_time = "8:00:00"
                labels = {"slurm-gcp"="compute"}
                machines = [{ name = "demo"
-                             disk_size_gb = 15
+                             disk_size_gb = 30
                              gpu_count = 0
                              gpu_type = ""
                              image = ""

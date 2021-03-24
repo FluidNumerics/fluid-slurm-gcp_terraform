@@ -124,6 +124,7 @@ locals {
     machine_type = var.controller_machine_type
     disk_size_gb = var.controller_disk_size_gb
     disk_type = "pd-standard"
+    image = var.controller_image
     labels = {"slurm-gcp"="controller"}
     project = var.primary_project
     region = local.primary_region
@@ -134,6 +135,7 @@ locals {
     machine_type = var.login_machine_type
     disk_size_gb = var.login_disk_size_gb
     disk_type = "pd-standard"
+    image = var.login_image
     labels = {"slurm-gcp"="login"}
     project = var.primary_project
     region = local.primary_region
@@ -200,6 +202,10 @@ locals {
 // Create the Slurm-GCP cluster
 module "slurm_gcp" {
   source  = "github.com/fluidnumerics/fluid-slurm-gcp_terraform"
+  cloudsql_name = var.cloudsql_name
+  cloudsql_network = google_compute_network.shared_vpc_network.self_link
+  cloudsql_slurmdb = var.cloudsql_slurmdb
+  cloudsql_tier = var.cloudsql_tier
   controller_image = var.controller_image
   compute_image = var.compute_image
   login_image = var.login_image

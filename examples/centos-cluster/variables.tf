@@ -4,6 +4,23 @@ variable "parent_folder" {
   default = ""
 }
 
+variable "cloudsql_slurmdb" {
+  type = bool
+  description = "Boolean flag to enable (True) or disable (False) CloudSQL Slurm Database"
+  default = false
+}
+
+variable "cloudsql_name" {
+  type = string
+  description = "Name of the cloudsql instance used to host the Slurm database, if cloudsql_slurmdb is set to true"
+  default = "slurmdb"
+}
+
+variable "cloudsql_tier" {
+  type = string
+  description = "Instance type of the CloudSQL instance. See https://cloud.google.com/sql/docs/mysql/instance-settings for more options."
+  default = "db-n1-standard-8"
+}
 variable "cluster_name" {
   type = string
   description = "Customer organization ID from the managed-fluid-slurm-gcp customers database"

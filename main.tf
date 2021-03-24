@@ -38,6 +38,7 @@ locals {
   oslogin = var.slurm_gcp_users
   oslogin_admins = var.slurm_gcp_admins
   service_account_users = flatten([var.slurm_gcp_users,var.slurm_gcp_admins,"serviceAccount:${google_service_account.slurm_controller.email}"])
+  primary_region = trimsuffix(var.controller.zone,substr(var.controller.zone,-2,-2))
 }
 
 
@@ -125,6 +126,53 @@ data "google_iam_policy" "slurm_gcp_iam" {
 
 
 // ***************************************** //
+// Create the Cloud SQL instance
+
+resource "google_compute_global_address" "private_ip_address" {
+  count = var.cloudsql_slurmdb ? 1 : 0
+  provider = google-beta
+  name = "private-ip-address"
+  purpose = "VPC_PEERING"
+  address_type = "INTERNAL"
+  prefix_length = 16
+  network = var.cloudsql_network
+  project = var.controller.project
+}
+
+resource "google_service_networking_connection" "private_vpc_connection" {
+  count = var.cloudsql_slurmdb ? 1 : 0
+  provider = google-beta
+  network = var.cloudsql_network
+  service = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address[0].name]
+}
+
+resource "google_sql_database_instance" "slurm_db" {
+  count = var.cloudsql_slurmdb ? 1 : 0
+  provider = google-beta
+  name = var.cloudsql_name
+  database_version = "MYSQL_5_6"
+  region = local.primary_region
+  project = var.controller.project
+  depends_on = [google_service_networking_connection.private_vpc_connection[0]]
+
+  settings {
+    tier = var.cloudsql_tier
+    ip_configuration {
+      ipv4_enabled  = false
+      private_network = var.cloudsql_network
+    }
+  }
+}
+
+locals {
+  slurm_db = var.cloudsql_slurmdb ? {"cloudsql_name":google_sql_database_instance.slurm_db[0].name, 
+                                     "cloudsql_ip":google_sql_database_instance.slurm_db[0].private_ip_address,
+                                     "cloudsql_port":6819} : {"cloudsql_name":"", 
+                                                              "cloudsql_ip":"",
+                                                              "cloudsql_port":6819}
+}
+// ***************************************** //
 // Create the cluster-config
 
 locals {
@@ -141,7 +189,8 @@ locals {
                      login = var.login,
                      mounts = var.mounts,
                      munge_key = var.munge_key,
-                     suspend_time = var.suspend_time
+                     suspend_time = var.suspend_time,
+                     slurm_db = local.slurm_db
                    }
                
 }
@@ -173,14 +222,6 @@ resource "google_compute_instance" "controller_node" {
     subnetwork  = var.controller.vpc_subnet
     access_config {
      // Currently create instance with ephemeral IP
-     // Specifying external IP causes failure
-     //   Error: Error creating instance: googleapi: Error 400: 
-     //   Invalid value for field 'resource.networkInterfaces[0].accessConfigs[0].natIP': '34.102.243.0'. 
-     //   The specified external IP address '34.102.243.0' was not found in region 'us-east1'., invalid
-     //   on ../modules/slurm-gcp-zfs/main.tf line 79, in resource "google_compute_instance" "controller_node":
-     //   79: resource "google_compute_instance" "controller_node" {
-     //
-     //nat_ip = google_compute_global_address.controller.address
     }
   }
   service_account {
@@ -191,12 +232,12 @@ resource "google_compute_instance" "controller_node" {
     ignore_changes = [metadata_startup_script]
   }
   allow_stopping_for_update = true
-  depends_on = [google_service_account.slurm_controller]
+  depends_on = [google_service_account.slurm_controller,
+                google_sql_database_instance.slurm_db]
 }
 
 // ***************************************** //
 // Create the login nodes
-
 resource "google_compute_instance" "login_node" {
   count = length(var.login)
   name = "${var.name}-login-${count.index}"
@@ -223,14 +264,6 @@ resource "google_compute_instance" "login_node" {
     subnetwork  = var.login[count.index].vpc_subnet
     access_config {
      // Currently create instance with ephemeral IP
-     // Specifying external IP causes failure
-     //   Error: Error creating instance: googleapi: Error 400: 
-     //   Invalid value for field 'resource.networkInterfaces[0].accessConfigs[0].natIP': '34.102.243.0'. 
-     //   The specified external IP address '34.102.243.0' was not found in region 'us-east1'., invalid
-     //   on ../modules/slurm-gcp-zfs/main.tf line 79, in resource "google_compute_instance" "login_node":
-     //   79: resource "google_compute_instance" "login_node" {
-     //
-     //nat_ip = google_compute_global_address.login[count.index].address
     }
   }
   service_account {

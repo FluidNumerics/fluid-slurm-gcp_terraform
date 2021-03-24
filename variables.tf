@@ -48,6 +48,7 @@ variable "controller" {
       machine_type = string
       disk_size_gb = number
       disk_type = string
+      image = string
       labels = map(string)
       project = string
       region = string
@@ -68,6 +69,7 @@ variable "login" {
       machine_type = string
       disk_size_gb = number
       disk_type = string
+      image = string
       labels = map(string)
       project = string
       region = string
@@ -119,17 +121,30 @@ variable "partitions" {
   description = "Settings for partitions and compute instances available to the cluster."
 }
 
-variable "slurm_db" {
-  type = object({
-    cloudsql_name = string
-    cloudsql_ip = string
-    cloudsql_port = number
-  })
-  default = { cloudsql_name = "", 
-              cloudsql_ip = "", 
-              cloudsql_port = 0}
+variable "cloudsql_slurmdb" {
+  type = bool
+  description = "Boolean flag to enable (True) or disable (False) CloudSQL Slurm Database"
+  default = false
 }
-  
+
+variable "cloudsql_name" {
+  type = string
+  description = "Name of the cloudsql instance used to host the Slurm database, if cloudsql_slurmdb is set to true"
+  default = "slurmdb"
+}
+
+variable "cloudsql_network"{
+  type = string
+  description = "GCP Network that is used for private communication between CloudSQL and the Slurm controller"
+  default = ""
+}
+
+variable "cloudsql_tier" {
+  type = string
+  description = "Instance type of the CloudSQL instance. See https://cloud.google.com/sql/docs/mysql/instance-settings for more options."
+  default = "db-n1-standard-8"
+}
+
 variable "slurm_accounts" {
   type = list(object({
       name = string

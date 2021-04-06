@@ -145,6 +145,12 @@ variable "cloudsql_tier" {
   default = "db-n1-standard-8"
 }
 
+variable "cloudsql_enable_ipv4" {
+  type = bool
+  description = "Flag to enable external access to the cloudsql instance"
+  default = false
+}
+
 variable "slurm_accounts" {
   type = list(object({
       name = string

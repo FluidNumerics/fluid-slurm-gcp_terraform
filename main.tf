@@ -158,7 +158,7 @@ resource "google_sql_database_instance" "slurm_db" {
   settings {
     tier = var.cloudsql_tier
     ip_configuration {
-      ipv4_enabled  = false
+      ipv4_enabled  = var.cloudsql_enable_ipv4
       private_network = var.cloudsql_network
     }
   }

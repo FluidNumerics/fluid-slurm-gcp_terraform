@@ -272,6 +272,7 @@ resource "google_compute_instance" "login_node" {
   lifecycle{
     ignore_changes = [metadata_startup_script]
   }
+  allow_stopping_for_update = true
   depends_on = [google_compute_instance.controller_node,
                 google_service_account.slurm_login]
 }

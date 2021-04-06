@@ -162,6 +162,7 @@ resource "google_sql_database_instance" "slurm_db" {
       private_network = var.cloudsql_network
     }
   }
+  deletion_protection = false
 }
 
 locals {

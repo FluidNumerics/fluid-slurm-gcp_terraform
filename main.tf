@@ -1,6 +1,5 @@
 // Configure the Google Cloud provider
 provider "google" {
- version = "3.9"
 }
 
 // ***************************************** //

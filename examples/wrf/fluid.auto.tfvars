@@ -20,7 +20,7 @@ partitions = [{name = "wrf-demo"
                              machine_type = "c2-standard-60"
                              max_node_count = 20
                              preemptible_bursting = false
-                             zone = "ZONE"
+                             zone = ""
                           }]
                }
 ]

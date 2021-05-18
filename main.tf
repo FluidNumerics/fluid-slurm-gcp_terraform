@@ -219,10 +219,13 @@ resource "google_compute_instance" "controller_node" {
     enable-oslogin = "TRUE"
   }
   network_interface {
-    subnetwork  = var.controller.vpc_subnet
-    access_config {
-     // Currently create instance with ephemeral IP
+
+    dynamic "access_config" {
+      for_each = var.controller.public_ips == true ? [1] : []
+        content {}
     }
+
+    subnetwork  = var.controller.vpc_subnet
   }
   service_account {
     email  = google_service_account.slurm_controller.email

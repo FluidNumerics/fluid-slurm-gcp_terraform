@@ -51,6 +51,7 @@ variable "controller" {
       image = string
       labels = map(string)
       project = string
+      public_ips = boolean
       region = string
       vpc_subnet = string
       zone = string

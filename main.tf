@@ -84,6 +84,13 @@ resource "google_project_iam_member" "project_service_account_users" {
   member = local.service_account_users[count.index]
 }
 
+resource "google_project_iam_member" "project_compute_image_users" {
+  count = length(local.service_account_users)
+  project = var.controller.project
+  role = "roles/compute.imageUser"
+  member = "serviceAccount:${google_service_account.slurm_controller.email}"
+}
+
 // If a folder is provided, set the IAM policies on the parent folder that houses the slurm-gcp deployment
 resource "google_folder_iam_policy" "slurm_gcp_folder_policy" {
   count = local.iam_folder_count

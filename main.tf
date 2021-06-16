@@ -175,8 +175,8 @@ resource "google_sql_database_instance" "slurm_db" {
 locals {
   slurm_db = var.cloudsql_slurmdb ? {"cloudsql_name":google_sql_database_instance.slurm_db[0].name, 
                                      "cloudsql_ip":google_sql_database_instance.slurm_db[0].private_ip_address,
-                                     "cloudsql_port":6819} : {"cloudsql_name":"", 
-                                                              "cloudsql_ip":"",
+                                     "cloudsql_port":6819} : {"cloudsql_name":"null", 
+                                                              "cloudsql_ip":"null",
                                                               "cloudsql_port":6819}
 }
 // ***************************************** //

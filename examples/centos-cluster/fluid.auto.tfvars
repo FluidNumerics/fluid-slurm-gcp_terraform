@@ -1,8 +1,15 @@
 cluster_name = "CLUSTER NAME"
-
 primary_project = "PROJECT ID"
 primary_zone = "ZONE"
+slurm_gcp_admins = ["group:support@example.com"]
+slurm_gcp_users = ["user:somebody@example.com"]
+slurm_accounts = [{ name = "demo-account",
+                    users = ["somebody"]
+                    allowed_partitions = ["demo"]
+                 }]
 
+
+// compute_image = "projects/PROJECT ID/global/images/IMAGE NAME"
 controller_machine_type = "n1-standard-8"
 login_machine_type = "n1-standard-8"
 
@@ -15,8 +22,8 @@ partitions = [{name = "demo"
                              gpu_count = 0
                              gpu_type = ""
                              image = ""
-                             machine_type = "n1-standard-32"
-                             max_node_count = 5
+                             machine_type = "c2-standard-60"
+                             max_node_count = 100
                              preemptible_bursting = false
                              zone = ""
                           }]
@@ -25,11 +32,5 @@ partitions = [{name = "demo"
 
 
 
-slurm_gcp_admins = ["group:support@example.com"]
-slurm_gcp_users = ["user:somebody@example.com"]
 
-slurm_accounts = [{ name = "demo-account",
-                    users = ["somebody"]
-                    allowed_partitions = ["demo"]
-                 }]
  

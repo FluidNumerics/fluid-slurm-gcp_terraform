@@ -36,7 +36,7 @@ resource "google_project_service" "service_networking" {
 
 locals {
   primary_region = trimsuffix(var.primary_zone,substr(var.primary_zone,-2,-2))
-  cluster_name = "${var.cluster_name}"
+  cluster_name = var.cluster_name
 }
 
 // Obtain a unique list of projects from the partitions, excluding the host project
@@ -127,6 +127,7 @@ locals {
     image = var.controller_image
     labels = {"slurm-gcp"="controller"}
     project = var.primary_project
+    public_ips = true
     region = local.primary_region
     vpc_subnet = google_compute_subnetwork.default_subnet.self_link
     zone = var.primary_zone

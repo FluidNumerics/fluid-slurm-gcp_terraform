@@ -50,6 +50,7 @@ At a minimum, set the following variables :
 * `slurm_gcp_admins` : The GMail or Google workspace user or group email addresses for individuals requiring root level access on the cluster
 * `slurm_gcp_users` : The GMail or Google workspace user or group email addresses for individuals requiring access to the cluster to submit jobs.
 * `slurm_accounts` : A list-object that specifies Slurm account names, users belonging to those accounts, and the partitions they can submit jobs to.
+* `partitions[0].machines[0].zone` : The GCP zone that will host the first partition's first machine block.
 
 You can set the controller and login node configurations using the following variables
 * `controller_machine_type` : The GCE machine type for the Slurm Controller
@@ -68,3 +69,17 @@ To create a custom VM image, we recommend using the [fluidnumerics/hpc-apps-gcp]
 * `_SOURCE_IMAGE_FAMILY=fluid-slurm-gcp-compute-centos`
 * `_SOURCE_IMAGE_PROJECT=fluid-cluster-ops`
 
+
+### How to deploy
+1. Initialize terraform
+```
+terraform init
+```
+2. Create a terraform plan and review.
+``` 
+terraform plan -out=tfplan
+```
+3. Deploy
+```
+terraform apply "tfplan" --auto-approve
+```

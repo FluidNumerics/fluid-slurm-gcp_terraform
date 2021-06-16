@@ -1,10 +1,10 @@
 cluster_name = "CLUSTER NAME"
-primary_project = "PROJECT ID"
+primary_project = "PROJECT"
 primary_zone = "ZONE"
 slurm_gcp_admins = ["group:support@example.com"]
-slurm_gcp_users = ["user:somebody@example.com"]
+slurm_gcp_users = ["user:someone@example.com"]
 slurm_accounts = [{ name = "demo-account",
-                    users = ["somebody"]
+                    users = ["someone"]
                     allowed_partitions = ["demo"]
                  }]
 
@@ -25,7 +25,7 @@ partitions = [{name = "demo"
                              machine_type = "c2-standard-60"
                              max_node_count = 100
                              preemptible_bursting = false
-                             zone = ""
+                             zone = "ZONE"
                           }]
                }
 ]

@@ -35,11 +35,13 @@ variable "subnet_cidr" {
 variable "slurm_gcp_admins" {
   type = list(string)
   description = "A list of users that will serve as Linux System Administrators on your cluster. Set each element to 'user:someone@example.com' for users or 'group:somegroup@example.com' for groups"
+  default = []
 }
 
 variable "slurm_gcp_users" {
   type = list(string)
   description = "A list of users that will serve as Linux System Administrators on your cluster. Set each element to 'user:someone@example.com' for users or 'group:somegroup@example.com' for groups"
+  default = []
 }
 
 variable "controller_image" {
